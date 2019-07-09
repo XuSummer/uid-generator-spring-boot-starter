@@ -15,7 +15,7 @@
  */
 package com.github.wujun234.uid.worker.dao;
 
-import com.github.wujun234.uid.worker.entity.WorkerNodeEntity;
+import com.github.wujun234.uid.worker.entity.WorkerNodeMybatisEntity;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
@@ -29,10 +29,10 @@ import org.springframework.stereotype.Repository;
  * @author wujun
  */
 @Repository
-public interface WorkerNodeDAO {
+public interface WorkerNodeMybatisDAO {
 
     /**
-     * Get {@link WorkerNodeEntity} by node host
+     * Get {@link WorkerNodeMybatisEntity} by node host
      * 
      * @param host
      * @param port
@@ -50,12 +50,12 @@ public interface WorkerNodeDAO {
             " WORKER_NODE" +
             " WHERE" +
             " HOST_NAME = #{host,jdbcType=VARCHAR} AND PORT = #{port,jdbcType=VARCHAR}")
-    WorkerNodeEntity getWorkerNodeByHostPort(@Param("host") String host, @Param("port") String port);
+    WorkerNodeMybatisEntity getWorkerNodeByHostPort(@Param("host") String host, @Param("port") String port);
 
     /**
-     * Add {@link WorkerNodeEntity}
+     * Add {@link WorkerNodeMybatisEntity}
      * 
-     * @param workerNodeEntity
+     * @param workerNodeMybatisEntity
      */
     @Insert("INSERT INTO WORKER_NODE" +
             "(HOST_NAME," +
@@ -72,6 +72,6 @@ public interface WorkerNodeDAO {
             "NOW()," +
             "NOW())")
     @Options(useGeneratedKeys = true, keyColumn = "id")
-    void addWorkerNode(WorkerNodeEntity workerNodeEntity);
+    void addWorkerNode(WorkerNodeMybatisEntity workerNodeMybatisEntity);
 
 }

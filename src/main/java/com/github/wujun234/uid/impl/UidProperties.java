@@ -31,14 +31,14 @@ public class UidProperties {
     private int seqBits = 7;
 
     /**
-     * 时间基点. 例如 2019-02-20 (毫秒: 1550592000000)
+     * 时间基点. 例如 2019-06-10 (毫秒: 1560096000000)
      */
-    private String epochStr = "2019-02-20";
+    private String epochStr = "2019-06-10";
 
     /**
      * 时间基点对应的毫秒数
      */
-    private long epochSeconds = TimeUnit.MILLISECONDS.toSeconds(1550592000000L);
+    private long epochSeconds = TimeUnit.MILLISECONDS.toSeconds(1560096000000L);
 
     /**
      * 是否容忍时钟回拨, 默认:true

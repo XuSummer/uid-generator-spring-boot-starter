@@ -26,7 +26,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  *
  * @author yutianbao
  */
-public class WorkerNodeEntity {
+public class WorkerNodeMybatisEntity {
 
     /**
      * Entity unique id (table unique)

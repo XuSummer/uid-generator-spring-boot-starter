@@ -15,10 +15,12 @@
  */
 package com.github.wujun234.uid.worker;
 
-import com.github.wujun234.uid.worker.dao.WorkerNodeDAO;
-import com.github.wujun234.uid.worker.entity.WorkerNodeEntity;
 import com.github.wujun234.uid.utils.DockerUtils;
 import com.github.wujun234.uid.utils.NetUtils;
+import com.github.wujun234.uid.worker.dao.WorkerNodeJPADAO;
+import com.github.wujun234.uid.worker.dao.WorkerNodeMybatisDAO;
+import com.github.wujun234.uid.worker.entity.WorkerNodeJPAEntity;
+
 import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,35 +29,35 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 
 /**
- * Represents an implementation of {@link WorkerIdAssigner}, 
+ * Represents an implementation of {@link WorkerIdAssigner},
  * the worker id will be discarded after assigned to the UidGenerator
- * 
+ *
  * @author yutianbao
  */
-public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DisposableWorkerIdAssigner.class);
+public class DisposableJPAWorkerIdAssigner implements WorkerIdAssigner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DisposableJPAWorkerIdAssigner.class);
 
     @Resource
-    private WorkerNodeDAO workerNodeDAO;
+    private WorkerNodeJPADAO workerNodeJPADAO;
 
     /**
      * Assign worker id base on database.<p>
      * If there is host name & port in the environment, we considered that the node runs in Docker container<br>
      * Otherwise, the node runs on an actual machine.
-     * 
+     *
      * @return assigned worker id
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
     public long assignWorkerId() {
         // build worker node entity
-        WorkerNodeEntity workerNodeEntity = buildWorkerNode();
+        WorkerNodeJPAEntity workerNodeMybatisEntity = buildWorkerNode();
 
         // add worker node for new (ignore the same IP + PORT)
-        workerNodeDAO.addWorkerNode(workerNodeEntity);
-        LOGGER.info("Add worker node:" + workerNodeEntity);
+        workerNodeJPADAO.save(workerNodeMybatisEntity);
+        LOGGER.info("Add worker node:" + workerNodeMybatisEntity);
 
-        return workerNodeEntity.getId();
+        return workerNodeMybatisEntity.getId();
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -67,8 +69,8 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
     /**
      * Build worker node entity by IP and PORT
      */
-    private WorkerNodeEntity buildWorkerNode() {
-        WorkerNodeEntity workerNodeEntity = new WorkerNodeEntity();
+    private WorkerNodeJPAEntity buildWorkerNode() {
+        WorkerNodeJPAEntity workerNodeEntity = new WorkerNodeJPAEntity();
         if (DockerUtils.isDocker()) {
             workerNodeEntity.setType(WorkerNodeType.CONTAINER.value());
             workerNodeEntity.setHostName(DockerUtils.getDockerHost());
@@ -78,12 +80,11 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
             workerNodeEntity.setHostName(NetUtils.getLocalAddress());
             workerNodeEntity.setPort(System.currentTimeMillis() + "-" + RandomUtils.nextInt(100000));
         }
-
         return workerNodeEntity;
     }
 
-    private WorkerNodeEntity buildFakeWorkerNode() {
-        WorkerNodeEntity workerNodeEntity = new WorkerNodeEntity();
+    private WorkerNodeJPAEntity buildFakeWorkerNode() {
+        WorkerNodeJPAEntity workerNodeEntity = new WorkerNodeJPAEntity();
         workerNodeEntity.setType(WorkerNodeType.FAKE.value());
         if (DockerUtils.isDocker()) {
             workerNodeEntity.setHostName(DockerUtils.getDockerHost());
